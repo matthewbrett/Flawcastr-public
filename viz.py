@@ -53,27 +53,27 @@ button_style = """
     }
 """
 
-# Plot colors
-plot_colors = {
-    'deterministic': '#6C63FF',    # Vibrant purple for main line
-    'previous': '#00C896',         # Bright teal for previous line
-    'probabilistic': '#D3D3D3',    # Light gray for probabilistic
-    'saved_scenarios': '#FF6B6B',  # Coral red for saved scenarios
-    'grid': '#E9ECEF'            # Lighter gray for grid lines
-}
+# Color scheme variables - using darker blue background
+BACKGROUND_COLOR = "#E1ECF4"      # Darker blue background for entire app
+INPUT_FIELD_COLOR = "#EDF2F7"     # Slightly lighter blue for input fields
+ACCENT_COLOR = "#6C63FF"          # Vibrant purple for primary actions
+GRID_COLOR = "#E9ECEF"            # Lighter gray for grid lines
 
-# Color scheme variables - using light blue background
-BACKGROUND_COLOR = "#EBF5FB"  # Light blue background for entire app
-ACCENT_COLOR = "#6C63FF"      # Vibrant purple for primary actions
-GRID_COLOR = "#E9ECEF"        # Lighter gray for grid lines
-
-# Ensure ALL background color variables are set to the same light blue
+# Ensure ALL background color variables are set to the same blue
 qwidget_background_colour = BACKGROUND_COLOR
 qsplitter_background_colour = BACKGROUND_COLOR
 qscrollarea_background_colour = BACKGROUND_COLOR
 init_plot_widget_facecolor = BACKGROUND_COLOR
 init_plot_widget_stylesheet_background_color = BACKGROUND_COLOR
 
+# Plot colors - more distinct and vibrant
+plot_colors = {
+    'deterministic': '#6C63FF',    # Vibrant purple for main line
+    'previous': '#00C896',         # Bright teal for previous line
+    'probabilistic': '#D3D3D3',    # Light gray for probabilistic
+    'saved_scenarios': '#FF6B6B',  # Coral red for saved scenarios
+    'grid': GRID_COLOR            # Consistent grid color
+}
 
 def currency_formatter(x, pos):
     return "${:,.0f}".format(x)
@@ -133,7 +133,7 @@ class MyWindow(QMainWindow):
         
         # Create buttons container with fixed height
         buttons_container = QWidget()
-        buttons_container.setFixedHeight(100)  # Adjust height as needed
+        buttons_container.setFixedHeight(80)  # Reduced from 100 to 80
         buttons_layout = QHBoxLayout(buttons_container)
         
         # Add buttons
@@ -198,26 +198,45 @@ class MyWindow(QMainWindow):
         clear_button.setStyleSheet(button_style)
         feedback_button.setStyleSheet(button_style)
         
-        # Apply background colors
-        main_widget.setStyleSheet(f"background-color: {qwidget_background_colour};")
-        buttons_container.setStyleSheet(f"""
-            QWidget {{
-                background-color: {qwidget_background_colour};
-                padding: 10px;
-                border-bottom: 1px solid {qsplitter_background_colour};
-            }}
-        """)
-
-        # Force background color on all widgets
+        # Force background color on all widgets and style input fields with larger font
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {BACKGROUND_COLOR};
+                font-size: 12pt;  /* Increased base font size */
+            }}
+            QLabel {{
+                font-size: 12pt;  /* Explicit font size for labels */
             }}
             QScrollArea {{ 
                 background-color: {BACKGROUND_COLOR};
             }}
             QScrollArea > QWidget > QWidget {{
                 background-color: {BACKGROUND_COLOR};
+            }}
+            QLineEdit {{
+                background-color: {INPUT_FIELD_COLOR};
+                border: 1px solid #D1D5DB;
+                border-radius: 4px;
+                padding: 5px;
+                font-size: 12pt;  /* Explicit font size for input fields */
+            }}
+            QComboBox {{
+                background-color: {INPUT_FIELD_COLOR};
+                border: 1px solid #D1D5DB;
+                border-radius: 4px;
+                padding: 5px;
+                font-size: 12pt;  /* Explicit font size for dropdowns */
+            }}
+            QPushButton {{
+                font-size: 11pt;  /* Slightly smaller font for buttons */
+                {button_style}
+            }}
+            QComboBox::drop-down {{
+                border: none;
+            }}
+            QComboBox::down-arrow {{
+                image: none;
+                border: none;
             }}
         """)
         
@@ -226,6 +245,12 @@ class MyWindow(QMainWindow):
         
         # Update canvas background
         self.canvas.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
+        self.fig.patch.set_facecolor(BACKGROUND_COLOR)
+        self.ax.set_facecolor(BACKGROUND_COLOR)
+
+        # Reduce spacing in button layout
+        buttons_layout.setContentsMargins(10, 5, 10, 5)  # Reduced vertical margins
+        buttons_layout.setSpacing(10)  # Reduced spacing between buttons
 
     def init_plot_widget(self):
         self.fig = Figure(facecolor=init_plot_widget_facecolor)
@@ -433,6 +458,11 @@ class MyWindow(QMainWindow):
         )
         
         self.ax.yaxis.set_major_formatter(FuncFormatter(currency_formatter))
+        
+        # Ensure plot background matches app background
+        self.fig.patch.set_facecolor(BACKGROUND_COLOR)
+        self.ax.set_facecolor(BACKGROUND_COLOR)
+        
         self.canvas.draw()
 
 
