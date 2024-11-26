@@ -1,3 +1,10 @@
+IMPROVEMENTS TO ADD - ADDED 26/11/24
+* Remove the right column, integrate elsewhere
+* Get rid of initial page, add to the main page so it is a single-page application
+* Make it more coherent and attractive
+* Better descriptions and hover appearance
+* Add export functionality - into CSV
+
 THIS README WAS LAST UPDATED IN FULL ON 23/7/24. HISTORY OF SUBSTANTIAL UPDATES IS AT THE FOOT OF THIS DOCUMENT.
 
 ===

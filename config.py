@@ -1,6 +1,6 @@
 from datetime import date
 
-expiry_date = date(2024, 10, 1)  # Year, Month, Day
+expiry_date = date(2025, 10, 1)  # Year, Month, Day
 
 opening_year = date.today().year
 explanations = "yes"  # this is somewhat historical. At the moment, nothing changes on this. However, there are some items in viz_widgets that are conditional on this being 'yes'. Eventually I'll update viz_widgets to clean this up and make this variable redundant.
