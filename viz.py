@@ -59,6 +59,11 @@ INPUT_FIELD_COLOR = "#EDF2F7"     # Slightly lighter blue for input fields
 ACCENT_COLOR = "#6C63FF"          # Vibrant purple for primary actions
 GRID_COLOR = "#E9ECEF"            # Lighter gray for grid lines
 
+# Add these font constants
+FONT_FAMILY = "Segoe UI"          # Modern, clean font that's available on most systems
+FONT_COLOR = "#333333"            # Dark gray for better readability
+TITLE_COLOR = "#1a1a1a"           # Slightly darker for the title
+
 # Ensure ALL background color variables are set to the same blue
 qwidget_background_colour = BACKGROUND_COLOR
 qsplitter_background_colour = BACKGROUND_COLOR
@@ -126,15 +131,89 @@ class MyWindow(QMainWindow):
         # Create main widget and layout
         main_widget = QWidget()
         main_layout = QHBoxLayout(main_widget)
+        main_layout.setContentsMargins(20, 20, 20, 20)  # Padding around entire window
+        main_layout.setSpacing(0)  # Set to 0 for no space between columns
         
-        # Create left side container
+        # Create right side container
+        right_container = QWidget()
+        right_layout = QVBoxLayout(right_container)
+        right_layout.setContentsMargins(0, 0, 0, 0)  # No internal padding
+        right_layout.setSpacing(0)  # No extra spacing
+        
+        # Create left side container (chart)
         left_container = QWidget()
         left_layout = QVBoxLayout(left_container)
+        left_layout.setContentsMargins(0, 0, 0, 0)  # No internal padding
+        left_layout.setSpacing(0)  # No extra spacing
         
-        # Create buttons container with fixed height
+        # Create scroll area container for input widgets
+        scroll_container = QWidget()
+        scroll_layout = QVBoxLayout(scroll_container)
+        scroll_layout.setContentsMargins(20, 20, 40, 20)
+        scroll_layout.setSpacing(12)  # Increased spacing between items
+        
+        # Initialize input widget
+        self.config_var_format = {}
+        init_input_widget(self)
+        
+        # Create scroll area for input widget
+        scroll = QScrollArea()
+        scroll.setStyleSheet(f"""
+            QScrollArea {{ 
+                border: none; 
+                background-color: {BACKGROUND_COLOR}; 
+                padding-right: 20px;
+            }}
+            QLineEdit, QComboBox {{
+                min-height: 30px;  /* Set minimum height for input fields */
+                padding: 5px;      /* Add internal padding */
+            }}
+            QLabel {{
+                min-height: 25px;  /* Set minimum height for labels */
+                padding: 5px 0;    /* Add vertical padding */
+            }}
+            QScrollBar:vertical {{
+                border: none;
+                background: transparent;
+                width: 6px;
+                margin: 0px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: #A5C4E0;
+                min-height: 20px;
+                border-radius: 3px;
+                opacity: 0.7;
+            }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0px;
+            }}
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: none;
+            }}
+            QScrollBar:horizontal {{
+                height: 0px;
+            }}
+        """)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.input_widget)
+        
+        # Ensure input widget uses proper spacing
+        self.input_widget.setLayout(QVBoxLayout())
+        self.input_widget.layout().setSpacing(12)  # Increased spacing between items
+        self.input_widget.layout().setContentsMargins(0, 0, 0, 0)
+        
+        # Add scroll area to scroll container
+        scroll_layout.addWidget(scroll)
+        
+        # Create buttons container
         buttons_container = QWidget()
-        buttons_container.setFixedHeight(80)  # Reduced from 100 to 80
         buttons_layout = QHBoxLayout(buttons_container)
+        buttons_layout.setContentsMargins(20, 10, 20, 20)  # Add consistent padding around buttons
+        buttons_layout.setSpacing(10)
         
         # Add buttons
         save_button = QPushButton("Save scenario for comparison")
@@ -148,44 +227,18 @@ class MyWindow(QMainWindow):
         buttons_layout.addWidget(clear_button)
         buttons_layout.addWidget(feedback_button)
         
-        # Add buttons container to left layout
-        left_layout.addWidget(buttons_container)
+        # Add widgets to left layout
+        left_layout.addWidget(scroll_container, 1)  # Add stretch factor
+        left_layout.addWidget(buttons_container, 0)  # No stretch
         
-        # Initialize input widget
-        self.config_var_format = {}
-        init_input_widget(self)
-        
-        # Create scroll area for input widget
-        scroll = QScrollArea()
-        scroll.setStyleSheet(f"""
-            QScrollArea {{ 
-                border: none; 
-                background-color: {qscrollarea_background_colour}; 
-            }}
-            QScrollBar:vertical {{
-                border: none;
-                background: lightgrey;
-                width: 5px;
-                opacity: 0.25;
-            }}
-            QScrollBar::handle:vertical {{
-                background: lightgrey;
-                min-height: 10px;
-            }}
-        """)
-        scroll.setWidgetResizable(True)
-        scroll.setWidget(self.input_widget)
-        
-        # Add scroll area to left layout
-        left_layout.addWidget(scroll)
-        
-        # Initialize plot
+        # Initialize and add plot
         self.last_deterministic_balances = None
         self.init_plot_widget()
+        right_layout.addWidget(self.canvas)
         
-        # Add widgets to main layout
+        # Add containers to main layout
+        main_layout.addWidget(right_container, 2)
         main_layout.addWidget(left_container, 1)
-        main_layout.addWidget(self.canvas, 2)
         
         self.setCentralWidget(main_widget)
         
@@ -202,10 +255,14 @@ class MyWindow(QMainWindow):
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {BACKGROUND_COLOR};
-                font-size: 12pt;  /* Increased base font size */
+                font-family: {FONT_FAMILY};
+                font-size: 12pt;
+                color: {FONT_COLOR};
             }}
             QLabel {{
-                font-size: 12pt;  /* Explicit font size for labels */
+                font-family: {FONT_FAMILY};
+                font-size: 12pt;
+                color: {FONT_COLOR};
             }}
             QScrollArea {{ 
                 background-color: {BACKGROUND_COLOR};
@@ -218,25 +275,23 @@ class MyWindow(QMainWindow):
                 border: 1px solid #D1D5DB;
                 border-radius: 4px;
                 padding: 5px;
-                font-size: 12pt;  /* Explicit font size for input fields */
+                font-family: {FONT_FAMILY};
+                font-size: 12pt;
+                color: {FONT_COLOR};
             }}
             QComboBox {{
                 background-color: {INPUT_FIELD_COLOR};
                 border: 1px solid #D1D5DB;
                 border-radius: 4px;
                 padding: 5px;
-                font-size: 12pt;  /* Explicit font size for dropdowns */
+                font-family: {FONT_FAMILY};
+                font-size: 12pt;
+                color: {FONT_COLOR};
             }}
             QPushButton {{
-                font-size: 11pt;  /* Slightly smaller font for buttons */
+                font-family: {FONT_FAMILY};
+                font-size: 11pt;
                 {button_style}
-            }}
-            QComboBox::drop-down {{
-                border: none;
-            }}
-            QComboBox::down-arrow {{
-                image: none;
-                border: none;
             }}
         """)
         
@@ -438,14 +493,32 @@ class MyWindow(QMainWindow):
             )
 
     def set_plot_aesthetics(self):
-        self.ax.set_xlabel(f"{config.client1_name}'s age")
-        self.ax.set_ylabel("Investment assets")
+        self.ax.set_xlabel(
+            f"{config.client1_name}'s age", 
+            fontsize=12, 
+            fontweight='normal',  # Changed from 'bold' to 'normal'
+            color=FONT_COLOR, 
+            fontfamily=FONT_FAMILY
+        )
+        self.ax.set_ylabel(
+            "Investment assets", 
+            fontsize=12, 
+            fontweight='normal',  # Changed from 'bold' to 'normal'
+            color=FONT_COLOR, 
+            fontfamily=FONT_FAMILY
+        )
         self.ax.set_ylim(bottom=0)
 
         if hasattr(self, "max_deterministic_balance"):
             self.ax.set_ylim(top=2 * self.max_deterministic_balance)
 
         self.ax.set_xlim(left=config.client1_age, right=config.age_to_follow_to)
+        
+        # Update tick label fonts to match
+        self.ax.tick_params(axis='both', labelsize=12)
+        for label in self.ax.get_xticklabels() + self.ax.get_yticklabels():
+            label.set_fontfamily(FONT_FAMILY)
+            label.set_color(FONT_COLOR)
         
         # Update grid style
         self.ax.grid(
