@@ -39,17 +39,17 @@ init_plot_widget_stylesheet_background_color = "#FFFFFF"  # Pure white
 # Button colors
 button_style = """
     QPushButton {
-        background-color: #0D6EFD;  /* Bootstrap primary blue */
+        background-color: #7FA5C4;
         color: white;
         border: none;
         padding: 8px 16px;
         border-radius: 4px;
     }
     QPushButton:hover {
-        background-color: #0B5ED7;  /* Slightly darker blue on hover */
+        background-color: #6E94B3;
     }
     QPushButton:pressed {
-        background-color: #0A58CA;  /* Even darker blue when pressed */
+        background-color: #5D83A2;
     }
 """
 
@@ -79,6 +79,10 @@ plot_colors = {
     'saved_scenarios': '#FF6B6B',  # Coral red for saved scenarios
     'grid': GRID_COLOR            # Consistent grid color
 }
+
+# Update these color constants at the top of viz.py
+SCROLLBAR_COLOR = "#A5C4E0"  # Light blue-gray color from your scrollbar
+BORDER_COLOR = "#A5C4E0"     # Matching color for borders
 
 def currency_formatter(x, pos):
     return "${:,.0f}".format(x)
@@ -236,9 +240,9 @@ class MyWindow(QMainWindow):
         self.init_plot_widget()
         right_layout.addWidget(self.canvas)
         
-        # Add containers to main layout
-        main_layout.addWidget(right_container, 2)
-        main_layout.addWidget(left_container, 1)
+        # Add containers to main layout in reverse order
+        main_layout.addWidget(left_container, 1)   # Now first
+        main_layout.addWidget(right_container, 2)  # Now second
         
         self.setCentralWidget(main_widget)
         
@@ -535,6 +539,16 @@ class MyWindow(QMainWindow):
         # Ensure plot background matches app background
         self.fig.patch.set_facecolor(BACKGROUND_COLOR)
         self.ax.set_facecolor(BACKGROUND_COLOR)
+        
+        # Add border styling to the plot
+        self.ax.spines['top'].set_color(BORDER_COLOR)
+        self.ax.spines['bottom'].set_color(BORDER_COLOR)
+        self.ax.spines['left'].set_color(BORDER_COLOR)
+        self.ax.spines['right'].set_color(BORDER_COLOR)
+        
+        # Optional: make the border slightly thicker if desired
+        for spine in self.ax.spines.values():
+            spine.set_linewidth(1.0)  # Adjust this value as needed
         
         self.canvas.draw()
 
