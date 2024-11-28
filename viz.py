@@ -27,14 +27,17 @@ import os
 import numpy as np
 import pandas as pd
 from viz_widgets import init_input_widget
+from styles import COLORS, PLOT_STYLES, COMMON_STYLES, BUTTON_STYLE
 
+# Remove duplicate color definitions and use imported styles
+BACKGROUND_COLOR = COLORS['background']
+INPUT_FIELD_COLOR = COLORS['input_field']
+FONT_FAMILY = "Segoe UI"
+FONT_COLOR = COLORS['text_primary']
+TITLE_COLOR = COLORS['text_title']
 
-###### TRY USING THESE FOR VIZ STYLING??? #########
-qwidget_background_colour = "#FFFFFF"  # Pure white background
-qsplitter_background_colour = "#F8F9FA"  # Light gray
-qscrollarea_background_colour = "#FFFFFF"  # Pure white
-init_plot_widget_facecolor = "#FFFFFF"  # Pure white
-init_plot_widget_stylesheet_background_color = "#FFFFFF"  # Pure white
+# Use plot colors from styles
+plot_colors = PLOT_STYLES['colors']
 
 # Button colors
 button_style = """
@@ -310,6 +313,10 @@ class MyWindow(QMainWindow):
         # Reduce spacing in button layout
         buttons_layout.setContentsMargins(10, 5, 10, 5)  # Reduced vertical margins
         buttons_layout.setSpacing(10)  # Reduced spacing between buttons
+
+        # Apply common styles to widgets
+        self.setStyleSheet(COMMON_STYLES['main_widget'])
+        self.input_widget.setStyleSheet(COMMON_STYLES['main_widget'] + COMMON_STYLES['input_fields'])  # Add input_fields style
 
     def init_plot_widget(self):
         self.fig = Figure(facecolor=init_plot_widget_facecolor)
