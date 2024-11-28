@@ -16,25 +16,13 @@ from PyQt5.QtWidgets import (
     QCheckBox,
 )
 from PyQt5.QtCore import Qt
-import config  # Import the config module to access the variable
-
-line_edit_background_colour = "#F7F5F2"
-
-# Common style for [?] buttons
-explanation_button_style = """
-    QLabel {
-        color: blue;
-        font-weight: bold;
-        font-size: 12px;
-        border: 1px solid black;
-        border-radius: 5px;
-        padding: 2px;
-        background-color: #f0f0f0;
-    }
-    QLabel:hover {
-        background-color: #e1e1e1;
-    }
-"""
+import config
+from styles import (
+    TOOLTIP_STYLE,
+    COMMON_STYLES,
+    FORM_LAYOUT,
+    CLIENT_DETAILS_STYLE,
+)
 
 
 def update_client_details_label(window):
@@ -117,22 +105,7 @@ def add_toggle(window, var_name, toggled_items, item_dict):
     if "explanation" in item_dict:
         tooltip_text = item_dict["explanation"]
         tooltip_label = QLabel("?")
-        tooltip_label.setStyleSheet(
-            """
-            QLabel {
-                color: blue;
-                font-weight: bold;
-                font-size: 12px;
-                border: 1px solid black;
-                border-radius: 5px;
-                padding: 2px;
-                background-color: #f0f0f0;
-            }
-            QLabel:hover {
-                background-color: #e1e1e1;
-            }
-        """
-        )
+        tooltip_label.setStyleSheet(TOOLTIP_STYLE)
         tooltip_label.setToolTip(tooltip_text)
         h_layout.addWidget(tooltip_label)
         h_layout.addItem(
@@ -466,7 +439,7 @@ def add_client_info(window, client):
     h_layout = QHBoxLayout()
     label_name = QLabel("Name:")
     field_name = QLineEdit(str(getattr(config, f"{client}_name")))
-    field_name.setStyleSheet(f"background-color: {line_edit_background_colour};")
+    field_name.setStyleSheet(COMMON_STYLES['input_fields'])
     window.config_fields[f"{client}_name"] = field_name
 
     h_layout.addWidget(label_name)
@@ -474,7 +447,7 @@ def add_client_info(window, client):
 
     label_age = QLabel("Age:")
     field_age = QLineEdit(str(getattr(config, f"{client}_age")))
-    field_age.setStyleSheet(f"background-color: {line_edit_background_colour};")
+    field_age.setStyleSheet(COMMON_STYLES['input_fields'])
     window.config_fields[f"{client}_age"] = field_age
 
     h_layout.addWidget(label_age)
@@ -484,15 +457,12 @@ def add_client_info(window, client):
 
 # Helper function to add dividers
 def add_divider(window):
-    # Add spacing before the divider
-    window.input_layout.insertSpacing(window.input_layout.count(), 20)
-    # Create and add the divider
+    window.input_layout.insertSpacing(window.input_layout.count(), FORM_LAYOUT['spacing']['divider'])
     divider = QFrame()
     divider.setFrameShape(QFrame.HLine)
     divider.setFrameShadow(QFrame.Sunken)
     window.input_layout.addWidget(divider)
-    # Add spacing after the divider
-    window.input_layout.insertSpacing(window.input_layout.count(), 20)
+    window.input_layout.insertSpacing(window.input_layout.count(), FORM_LAYOUT['spacing']['divider'])
 
 
 def add_input_field(window, var_name, item_dict):
@@ -501,11 +471,8 @@ def add_input_field(window, var_name, item_dict):
     label_text = item_dict.get("label", var_name.replace("_", " ").capitalize() + ":")
     label = QLabel(label_text)
 
-    # label.setWordWrap(True)
-    # label.setFixedWidth(150)  # You can adjust the width according to your needs
-
     field = QLineEdit()
-    field.setStyleSheet(f"background-color: {line_edit_background_colour};")
+    field.setStyleSheet(COMMON_STYLES['input_fields'])
 
     # Store references to the label and field using unique keys
     label_key = f"{var_name}_label"
@@ -532,22 +499,7 @@ def add_input_field(window, var_name, item_dict):
     tooltip_text = item_dict.get("explanation", "")
     if tooltip_text:
         tooltip_label = QLabel("?")
-        tooltip_label.setStyleSheet(
-            """
-            QLabel {
-                color: blue;
-                font-weight: bold;
-                font-size: 12px;
-                border: 1px solid black;
-                border-radius: 5px;
-                padding: 2px;
-                background-color: #f0f0f0;
-            }
-            QLabel:hover {
-                background-color: #e1e1e1;
-            }
-        """
-        )
+        tooltip_label.setStyleSheet(TOOLTIP_STYLE)
         tooltip_label.setToolTip(tooltip_text)
         h_layout.addWidget(tooltip_label)
 
@@ -572,7 +524,7 @@ def add_text_with_explanation(window, text, explanation=""):
     if explanation:
         explanation_button = QLabel("[?]")
         explanation_button.setToolTip(explanation)
-        explanation_button.setStyleSheet(explanation_button_style)
+        explanation_button.setStyleSheet(TOOLTIP_STYLE)
         h_layout.addWidget(explanation_button)
 
         # Add a stretch element to ensure the button takes minimal space
@@ -599,7 +551,7 @@ def add_multi_input_field(window, item_dict):
 
             label = QLabel(label_text)
             field = QLineEdit(str(getattr(config, var_name, "")))
-            field.setStyleSheet(f"background-color: {line_edit_background_colour};")
+            field.setStyleSheet(COMMON_STYLES['input_fields'])
 
             window.config_fields[f"{var_name}_label"] = label
             window.config_fields[var_name] = field
@@ -640,6 +592,7 @@ def init_input_widget(window):
 
     # Create and add the client details label
     window.client_details_label = QLabel()
+    window.client_details_label.setStyleSheet(CLIENT_DETAILS_STYLE)
     window.input_layout.addWidget(window.client_details_label)
     update_client_details_label(window)  # Initial update of the label
 

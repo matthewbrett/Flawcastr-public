@@ -167,3 +167,49 @@ COMMON_STYLES = {
         }}
     """
 }
+
+# Form Layout Constants
+FORM_LAYOUT = {
+    'spacing': {
+        'divider': 20,          # Spacing around dividers
+        'section': 10,          # Spacing between sections
+        'field': 5             # Spacing between fields
+    },
+    'dimensions': {
+        'label_width': 150,    # Fixed width for labels
+        'tooltip_width': 20    # Width for tooltip buttons
+    }
+}
+
+# Explanation Button Style
+TOOLTIP_STYLE = """
+    QLabel {
+        color: blue;
+        font-weight: bold;
+        font-size: 12px;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 2px;
+        background-color: #f0f0f0;
+    }
+    QLabel:hover {
+        background-color: #e1e1e1;
+    }
+"""
+
+# Divider Style
+DIVIDER_STYLE = {
+    'color': COLORS['border'],
+    'height': 1,
+    'margin': 20
+}
+
+# Client Details Label Style
+CLIENT_DETAILS_STYLE = """
+    QLabel {
+        font-size: 14pt;
+        font-weight: bold;
+        margin: 20px 0;
+        color: #333333;
+    }
+"""
