@@ -14,6 +14,13 @@ import config  # Importing the config module
 import os
 import csv
 from datetime import datetime, date
+from styles import (
+    COMMON_STYLES,
+    BUTTON_STYLE,
+    TYPOGRAPHY,
+    COLORS,
+    FORM_LAYOUT
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 default_csv_path = os.path.join(BASE_DIR, "default.csv")
@@ -126,22 +133,34 @@ update_config_from_csv(default_csv_path, config)
 class ClientInfoDialog(QDialog):
     def __init__(self):
         super().__init__()
-
-        self.resize(900, 850)  # Adjust width and height as needed
-
-        self.setWindowTitle("Welcome to Flawcastr!")
-        layout = QFormLayout()
-        self.setLayout(layout)
-
-        # Set font for the dialog
-        font = self.font()
-        font.setPointSize(10)
-        self.setFont(font)
-
-        # Add logo image
+        
+        # Create and load the logo first to get its dimensions
         logo = QLabel()
         image_path = os.path.join(BASE_DIR, "flawcastr_logo.jpeg")
         pixmap = QPixmap(image_path)
+        logo_width = pixmap.width()
+        
+        # Set window width to match logo width, with some padding
+        padding = 40  # 20px on each side
+        window_width = logo_width + padding
+        window_height = 850  # Keep existing height
+        self.resize(window_width, window_height)
+
+        self.setWindowTitle("Welcome to Flawcastr!")
+        layout = QFormLayout()
+        layout.setSpacing(FORM_LAYOUT['spacing']['field'])
+        self.setLayout(layout)
+
+        # Set font for the dialog using TYPOGRAPHY
+        font = self.font()
+        font.setFamily(TYPOGRAPHY['family'])
+        font.setPointSize(int(TYPOGRAPHY['size']['normal'].replace('pt', '')))
+        self.setFont(font)
+
+        # Set the dialog's background color and general styling
+        self.setStyleSheet(COMMON_STYLES['main_widget'])
+
+        # Add the already-loaded logo
         logo.setPixmap(pixmap)
         layout.addRow(logo)
 
@@ -149,25 +168,28 @@ class ClientInfoDialog(QDialog):
             "Welcome to Flawcastr! Before we begin, please enter some basic information about what you want to model."
         )
         welcome_label.setWordWrap(True)
+        welcome_label.setStyleSheet(f"color: {COLORS['text_primary']};")
+        
         age_label = QLabel("")
         age_label.setWordWrap(True)
+        age_label.setStyleSheet(f"color: {COLORS['text_primary']};")
 
-        # Add introductory text
         layout.addRow(welcome_label)
 
         # Dropdown for individual or couple
         self.individual_or_couple = QComboBox()
+        self.individual_or_couple.setStyleSheet(COMMON_STYLES['input_fields'])
         self.individual_or_couple.addItems(["individual", "couple"])
-        self.individual_or_couple.currentIndexChanged.connect(
-            self.update_client2_visibility
-        )
+        self.individual_or_couple.currentIndexChanged.connect(self.update_client2_visibility)
         layout.addRow("Individual or couple:", self.individual_or_couple)
 
         # Fields for client names and ages
         self.client1_name_label = QLabel("Name:")
         self.client1_name = QLineEdit(config.client1_name)
+        self.client1_name.setStyleSheet(COMMON_STYLES['input_fields'])
         self.client1_age_label = QLabel("Age:")
         self.client1_age = QLineEdit(str(config.client1_age))
+        self.client1_age.setStyleSheet(COMMON_STYLES['input_fields'])
 
         layout.addRow(self.client1_name_label, self.client1_name)
         layout.addRow(self.client1_age_label, self.client1_age)
@@ -175,28 +197,29 @@ class ClientInfoDialog(QDialog):
         # Client 2 fields
         self.client2_name_label = QLabel("Name:")
         self.client2_name = QLineEdit(config.client2_name)
+        self.client2_name.setStyleSheet(COMMON_STYLES['input_fields'])
         self.client2_age_label = QLabel("Age:")
         self.client2_age = QLineEdit(str(config.client2_age))
+        self.client2_age.setStyleSheet(COMMON_STYLES['input_fields'])
 
         layout.addRow(self.client2_name_label, self.client2_name)
         layout.addRow(self.client2_age_label, self.client2_age)
 
         # Field for age to follow to
         self.age_to_follow_to_label = QLabel("Maximum age to model: ")
-        self.age_to_follow_to = QLineEdit(
-            str(config.age_to_follow_to)
-        )  # this needs to change another variable, as well: years_to_model
+        self.age_to_follow_to = QLineEdit(str(config.age_to_follow_to))
+        self.age_to_follow_to.setStyleSheet(COMMON_STYLES['input_fields'])
         layout.addRow(self.age_to_follow_to_label, self.age_to_follow_to)
 
-        # Add conclusion text
         layout.addRow(age_label)
 
         # Submit button
         submit_button = QPushButton("Get started!")
+        submit_button.setStyleSheet(BUTTON_STYLE)
         submit_button.clicked.connect(self.accept)
         layout.addRow(submit_button)
 
-        # Set default values and update visibility based on 'individual_or_couple'
+        # Set default values and update visibility
         self.individual_or_couple.setCurrentText(config.individual_or_couple)
         self.update_client2_visibility()
 
