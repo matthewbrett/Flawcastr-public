@@ -25,6 +25,56 @@ from styles import (
 )
 
 
+class CollapsibleSection(QWidget):
+    def __init__(self, title):
+        super().__init__()
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)  # Keep minimal margins
+        self.layout.setSpacing(0)  # Minimize spacing between elements
+        
+        # Header button
+        self.toggle_button = QPushButton(f"▶ {title}")
+        self.toggle_button.setStyleSheet("""
+            QPushButton {
+                text-align: left;
+                padding: 2px;
+                border: none;
+                background-color: transparent;
+                font-weight: bold;
+            }
+        """)
+        
+        # Content widget
+        self.content = QWidget()
+        self.content.setStyleSheet("""
+            QWidget {
+                min-height: 15px;
+            }
+        """)
+        self.content_layout = QVBoxLayout(self.content)
+        self.content_layout.setContentsMargins(10, 0, 0, 0)  # Just keep left indent
+        self.content_layout.setSpacing(0)  # Minimize spacing between content items
+        self.content.setVisible(False)  # Start collapsed
+        
+        # Add to main layout
+        self.layout.addWidget(self.toggle_button)
+        self.layout.addWidget(self.content)
+        
+        # Connect toggle
+        self.toggle_button.clicked.connect(self.toggle_section)
+    
+    def toggle_section(self):
+        is_visible = not self.content.isVisible()
+        self.content.setVisible(is_visible)
+        self.toggle_button.setText(f"{'▼' if is_visible else '▶'} {self.toggle_button.text()[2:]}")
+    
+    def add_widget(self, widget):
+        self.content_layout.addWidget(widget)
+    
+    def add_layout(self, layout):
+        self.content_layout.addLayout(layout)
+
+
 def update_client_details_label(window):
     if getattr(config, "individual_or_couple", "individual") == "individual":
         # For an individual, use this format
@@ -74,7 +124,7 @@ def on_combobox_changed(window, var_name, combobox):
     window.plot_needs_update.emit()
 
 
-def add_toggle(window, var_name, toggled_items, item_dict):
+def add_toggle(window, var_name, toggled_items, item_dict, section=None):
     h_layout = QHBoxLayout()
     label_text = item_dict.get("label", var_name.replace("_", " ").capitalize())
 
@@ -89,7 +139,12 @@ def add_toggle(window, var_name, toggled_items, item_dict):
     toggle.setChecked(initial_state)
 
     h_layout.addWidget(toggle)
-    window.input_layout.addLayout(h_layout)
+    
+    # Add to section if provided, otherwise add to main layout
+    if section:
+        section.add_layout(h_layout)
+    else:
+        window.input_layout.addLayout(h_layout)
 
     # Connect the signal to the on_toggle_changed function
     toggle.stateChanged.connect(
@@ -465,7 +520,7 @@ def add_divider(window):
     window.input_layout.insertSpacing(window.input_layout.count(), FORM_LAYOUT['spacing']['divider'])
 
 
-def add_input_field(window, var_name, item_dict):
+def add_input_field(window, var_name, item_dict, section=None):
     h_layout = QHBoxLayout()
 
     label_text = item_dict.get("label", var_name.replace("_", " ").capitalize() + ":")
@@ -503,7 +558,10 @@ def add_input_field(window, var_name, item_dict):
         tooltip_label.setToolTip(tooltip_text)
         h_layout.addWidget(tooltip_label)
 
-    window.input_layout.addLayout(h_layout)
+    if section:
+        section.add_layout(h_layout)
+    else:
+        window.input_layout.addLayout(h_layout)
 
     # Connect the editingFinished signal to the on_field_edit_finish function
     field.editingFinished.connect(lambda: on_field_edit_finish(window, var_name, field))
@@ -512,7 +570,7 @@ def add_input_field(window, var_name, item_dict):
     set_field_and_label_visibility(window, var_name, item_dict)
 
 
-def add_text_with_explanation(window, text, explanation=""):
+def add_text_with_explanation(window, text, explanation="", section=None):
     h_layout = QHBoxLayout()
 
     # Create a QLabel for the text
@@ -533,13 +591,16 @@ def add_text_with_explanation(window, text, explanation=""):
     # Consistent spacing as in other widgets
     h_layout.setSpacing(5)  # Adjust the spacing as needed
 
-    window.input_layout.addLayout(h_layout)
+    if section:
+        section.add_layout(h_layout)
+    else:
+        window.input_layout.addLayout(h_layout)
 
 
-def add_multi_input_field(window, item_dict):
+def add_multi_input_field(window, item_dict, section=None):
     h_layout = QHBoxLayout()
 
-    for index in range(1, 3):  # Assuming two pairs of var_name and label
+    for index in range(1, 3):
         var_name_key = f"var_name{index}"
         label_key = f"label_{item_dict[var_name_key]}"
 
@@ -563,7 +624,11 @@ def add_multi_input_field(window, item_dict):
             h_layout.addWidget(label)
             h_layout.addWidget(field)
 
-    window.input_layout.addLayout(h_layout)
+    # Add to section if provided, otherwise add to main layout
+    if section:
+        section.add_layout(h_layout)
+    else:
+        window.input_layout.addLayout(h_layout)
 
 
 def set_field_and_label_visibility(window, var_name, item_dict):
@@ -580,55 +645,90 @@ def set_field_and_label_visibility(window, var_name, item_dict):
     if field_key in window.config_fields:
         window.config_fields[field_key].setVisible(field_visible)
 
+def toggle_all_sections(window, button):
+    is_expanding = button.text() == "Expand All"
+    for section in window.sections:
+        section.content.setVisible(is_expanding)
+        section.toggle_button.setText(f"{'▼' if is_expanding else '▶'} {section.toggle_button.text()[2:]}")
+    button.setText("Collapse All" if is_expanding else "Expand All")
 
 def init_input_widget(window):
     window.input_widget = QWidget()
     window.input_layout = QVBoxLayout()
     window.input_layout.setAlignment(Qt.AlignTop)
     window.config_fields = {}
+    window.sections = []  # Track all sections
 
-    # Add spacing above the client details label
-    window.input_layout.addSpacing(20)  # Adjust the value as needed
-
-    # Create and add the client details label
+    # Add client details label
+    window.input_layout.addSpacing(20)
     window.client_details_label = QLabel()
     window.client_details_label.setStyleSheet(CLIENT_DETAILS_STYLE)
     window.input_layout.addWidget(window.client_details_label)
-    update_client_details_label(window)  # Initial update of the label
+    update_client_details_label(window)
+    window.input_layout.addSpacing(20)
 
-    # Add spacing below the client details label
-    window.input_layout.addSpacing(20)  # Adjust the value as needed
+    # Add Expand/Collapse All button
+    expand_all_button = QPushButton("Expand All")
+    expand_all_button.setStyleSheet("""
+        QPushButton {
+            padding: 5px;
+            font-weight: bold;
+            background-color: transparent;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            max-width: 100px;
+        }
+        QPushButton:hover {
+            background-color: #f0f0f0;
+        }
+    """)
+    expand_all_button.clicked.connect(lambda: toggle_all_sections(window, expand_all_button))
+    window.input_layout.addWidget(expand_all_button)
+    window.input_layout.addSpacing(10)
 
-    # Rest of the initialization code...
+    section_titles = {
+        1: "Opening balance",
+        2: "Savings",
+        3: "Investment returns",
+        4: "Randomness (Monte Carlo)",
+        5: "Retirement, etc",
+        6: "NZ Super",
+        7: "Periodic expenditure",
+        8: "One-off items",
+        9: "Assistance to children"
+    }
+    
+    current_section = None
+    section_count = 0
 
-    # Check the initial state of the 'explanations' variable from config.py
-    explanations_enabled = getattr(config, "explanations", "yes") == "yes"
-
-    # Initialize other UI components based on the config_var_list
+    # Process config_var_list
     for item_dict in config_var_list:
         item_type = item_dict.get("type")
-        var_name = item_dict.get("var_name", f"text_{len(window.config_fields)}")
-
+        
+        # Create new section at each divider
         if item_type == "divider":
-            add_divider(window)
-        elif item_type == "multi_input":
-            add_multi_input_field(window, item_dict)
+            section_count += 1
+            current_section = CollapsibleSection(section_titles.get(section_count, f"Section {section_count}"))
+            window.sections.append(current_section)  # Add section to tracking list
+            window.input_layout.addWidget(current_section)
+            continue
+            
+        # Create layout for the item
+        if item_type == "multi_input":
+            add_multi_input_field(window, item_dict, current_section)
         elif item_type == "toggle":
+            var_name = item_dict.get("var_name")
             toggled_items = item_dict.get("toggled_items", [])
-            add_toggle(window, var_name, toggled_items, item_dict)
+            add_toggle(window, var_name, toggled_items, item_dict, current_section)
+        elif item_type == "input":
+            var_name = item_dict.get("var_name")
+            add_input_field(window, var_name, item_dict, current_section)
         elif item_type == "text":
             text = item_dict.get("text", "")
             explanation = item_dict.get("explanation", "")
-            add_text_with_explanation(window, text, explanation)
-
-        elif item_type == "combobox":
-            add_combobox(window, var_name, item_dict["options"])
-        elif item_type in "input":
-            # Add widgets based on type
-            add_widget_based_on_type(window, item_type, var_name, item_dict)
+            add_text_with_explanation(window, text, explanation, current_section)
 
     update_field_visibility(window)
-
     window.input_widget.setLayout(window.input_layout)
 
 
