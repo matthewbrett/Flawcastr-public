@@ -94,42 +94,12 @@ def update_config_from_csv(csv_path, config_module, initial_load=False, skip_var
                             )
     return loaded_vars
 
-
-# Ensure this function is defined in your script
 def load_initial_configuration():
     # Load only the relevant variables for the initial window
     loaded_vars = update_config_from_csv(default_csv_path, config, initial_load=True)
     # Additional logic could be added here to handle defaults if needed
 
-
-# Check if default.csv exists and update config
 update_config_from_csv(default_csv_path, config)
-
-# def initialize_simulation():
-#     valid_balance = False
-#     iteration_count = 0  # Add a counter to track the number of iterations
-
-#     while not valid_balance:
-#         iteration_count += 1
-#         logging.debug(f"Iteration: {iteration_count}")
-
-#         deterministic_balances = calcs.calculate_deterministic_balances()
-
-#         final_balance = deterministic_balances[-1]
-#         min_balance = min(deterministic_balances)
-
-#         # Check if the final balance is within the desired range and no balance is negative
-#         if 0 <= final_balance <= 1000000 and all(balance >= 0 for balance in deterministic_balances):
-#             valid_balance = True
-#         else:
-#             logging.debug("Valid balance not found, continuing loop.")
-
-#         if iteration_count > 100:  # Add a failsafe to avoid infinite loops
-#             logging.warning("Maximum iterations reached, breaking loop.")
-#             break
-
-#     return deterministic_balances
-
 
 class ClientInfoDialog(QDialog):
     def __init__(self):
