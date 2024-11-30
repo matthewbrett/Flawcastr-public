@@ -21,36 +21,73 @@ from styles import (
 )
 from viz_widgets_config import section_titles, config_var_list  # Add this line
 
+# Layout Constants
+SECTION_LAYOUT_MARGINS = (0, 0, 0, 0)
+SECTION_LAYOUT_SPACING = 5
+CONTENT_LAYOUT_MARGINS = (10, 0, 0, 0)
+CONTENT_LAYOUT_SPACING = 5
+
+# Spacing Constants
+CLIENT_DETAILS_SPACING = 20
+EXPAND_BUTTON_SPACING = 10
+TEXT_EXPLANATION_SPACING = 5
+SPACER_SIZE = 20  # For QSpacerItem
+
+# Widget Styling
+CONTENT_WIDGET_STYLE = """
+    QWidget {
+        min-height: 25px;
+    }
+"""
+
+SECTION_TOGGLE_BUTTON_STYLE = """
+    QPushButton {
+        text-align: left;
+        padding: 2px;
+        border: none;
+        background-color: transparent;
+        font-weight: bold;
+    }
+"""
+
+EXPAND_ALL_BUTTON_STYLE = """
+    QPushButton {
+        padding: 5px;
+        font-weight: bold;
+        background-color: transparent;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        max-width: 100px;
+    }
+    QPushButton:hover {
+        background-color: #f0f0f0;
+    }
+"""
+
+# Divider Configuration
+DIVIDER_STYLE = {
+    'shape': QFrame.HLine,
+    'shadow': QFrame.Sunken
+}
+
 class CollapsibleSection(QWidget):
     def __init__(self, title):
         super().__init__()
         self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)  # Keep minimal margins
-        self.layout.setSpacing(0)  # Minimize spacing between elements
+        self.layout.setContentsMargins(*SECTION_LAYOUT_MARGINS)
+        self.layout.setSpacing(SECTION_LAYOUT_SPACING)
         
         # Header button
         self.toggle_button = QPushButton(f"▶ {title}")
-        self.toggle_button.setStyleSheet("""
-            QPushButton {
-                text-align: left;
-                padding: 2px;
-                border: none;
-                background-color: transparent;
-                font-weight: bold;
-            }
-        """)
+        self.toggle_button.setStyleSheet(SECTION_TOGGLE_BUTTON_STYLE)
         
         # Content widget
         self.content = QWidget()
-        self.content.setStyleSheet("""
-            QWidget {
-                min-height: 15px;
-            }
-        """)
+        self.content.setStyleSheet(CONTENT_WIDGET_STYLE)
         self.content_layout = QVBoxLayout(self.content)
-        self.content_layout.setContentsMargins(10, 0, 0, 0)  # Just keep left indent
-        self.content_layout.setSpacing(0)  # Minimize spacing between content items
-        self.content.setVisible(False)  # Start collapsed
+        self.content_layout.setContentsMargins(*CONTENT_LAYOUT_MARGINS)
+        self.content_layout.setSpacing(CONTENT_LAYOUT_SPACING)
+        self.content.setVisible(False)
         
         # Add to main layout
         self.layout.addWidget(self.toggle_button)
@@ -156,7 +193,7 @@ def add_toggle(window, var_name, toggled_items, item_dict, section=None):
         tooltip_label.setToolTip(tooltip_text)
         h_layout.addWidget(tooltip_label)
         h_layout.addItem(
-            QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            QSpacerItem(SPACER_SIZE, SPACER_SIZE, QSizePolicy.Expanding, QSizePolicy.Minimum)
         )
 
     # Check the state of the 'explanations' variable
@@ -217,8 +254,8 @@ def add_client_info(window, client):
 def add_divider(window):
     window.input_layout.insertSpacing(window.input_layout.count(), FORM_LAYOUT['spacing']['divider'])
     divider = QFrame()
-    divider.setFrameShape(QFrame.HLine)
-    divider.setFrameShadow(QFrame.Sunken)
+    divider.setFrameShape(DIVIDER_STYLE['shape'])
+    divider.setFrameShadow(DIVIDER_STYLE['shadow'])
     window.input_layout.addWidget(divider)
     window.input_layout.insertSpacing(window.input_layout.count(), FORM_LAYOUT['spacing']['divider'])
 
@@ -275,24 +312,17 @@ def add_input_field(window, var_name, item_dict, section=None):
 
 def add_text_with_explanation(window, text, explanation="", section=None):
     h_layout = QHBoxLayout()
-
-    # Create a QLabel for the text
     text_label = QLabel(text)
-    # text_label.setWordWrap(True)
     h_layout.addWidget(text_label)
 
-    # If there's an explanation, add a [?] button with tooltip
     if explanation:
         explanation_button = QLabel("[?]")
         explanation_button.setToolTip(explanation)
         explanation_button.setStyleSheet(TOOLTIP_STYLE)
         h_layout.addWidget(explanation_button)
-
-        # Add a stretch element to ensure the button takes minimal space
         h_layout.addStretch(1)
 
-    # Consistent spacing as in other widgets
-    h_layout.setSpacing(5)  # Adjust the spacing as needed
+    h_layout.setSpacing(TEXT_EXPLANATION_SPACING)
 
     if section:
         section.add_layout(h_layout)
@@ -363,31 +393,19 @@ def init_input_widget(window):
     window.sections = []  # Track all sections
 
     # Add client details label
-    window.input_layout.addSpacing(20)
+    window.input_layout.addSpacing(CLIENT_DETAILS_SPACING)
     window.client_details_label = QLabel()
     window.client_details_label.setStyleSheet(CLIENT_DETAILS_STYLE)
     window.input_layout.addWidget(window.client_details_label)
     update_client_details_label(window)
-    window.input_layout.addSpacing(20)
+    window.input_layout.addSpacing(CLIENT_DETAILS_SPACING)
 
     # Add Expand/Collapse All button
     expand_all_button = QPushButton("Expand All")
-    expand_all_button.setStyleSheet("""
-        QPushButton {
-            padding: 5px;
-            font-weight: bold;
-            background-color: transparent;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            max-width: 100px;
-        }
-        QPushButton:hover {
-            background-color: #f0f0f0;
-        }
-    """)
+    expand_all_button.setStyleSheet(EXPAND_ALL_BUTTON_STYLE)
     expand_all_button.clicked.connect(lambda: toggle_all_sections(window, expand_all_button))
     window.input_layout.addWidget(expand_all_button)
-    window.input_layout.addSpacing(10)
+    window.input_layout.addSpacing(EXPAND_BUTTON_SPACING)
     
     current_section = None
     section_count = 0
@@ -535,3 +553,6 @@ def update_config_var(window, var_name, new_value):
     except ValueError:
         # Handle the error for invalid input
         pass
+
+def add_spacer(layout):
+    layout.addItem(QSpacerItem(SPACER_SIZE, SPACER_SIZE, QSizePolicy.Expanding, QSizePolicy.Minimum))
