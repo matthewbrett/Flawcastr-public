@@ -6,33 +6,27 @@ the application. It's organized by component type and usage context.
 """
 
 # =============================================================================
-# Color Palette
+# Primary Color Palette
 # =============================================================================
 COLORS = {
     # Base colors
-    'background': "#E1ECF4",      # Main application background
-    'input_field': "#EDF2F7",     # Form input backgrounds
-    'accent': "#6C63FF",          # Primary accent color
-    'grid': "#E9ECEF",            # Grid lines in charts
-    'border': "#A5C4E0",          # Border colors
-    'scrollbar': "#A5C4E0",       # Scrollbar styling
+    'background': "#E1ECF4",
+    'input_field': "#EDF2F7",
+    'accent': "#6C63FF",
+    'grid': "#E9ECEF",
+    'border': "#A5C4E0",
+    'scrollbar': "#A5C4E0",
     
     # Text colors
-    'text_primary': "#333333",    # Primary text color
-    'text_title': "#1a1a1a",      # Title text color
-    
-    # Plot-specific colors
-    'plot_deterministic': '#6C63FF',    # Main line in plots
-    'plot_previous': '#00C896',         # Previous scenario line
-    'plot_probabilistic': '#D3D3D3',    # Probabilistic scenarios
-    'plot_saved': '#FF6B6B',            # Saved scenarios
+    'text_primary': "#333333",
+    'text_title': "#1a1a1a",
 }
 
 # =============================================================================
 # Typography
 # =============================================================================
 TYPOGRAPHY = {
-    'family': "Segoe UI",    # Main font family
+    'family': "Segoe UI",
     'size': {
         'normal': "12pt",
         'small': "11pt",
@@ -41,26 +35,26 @@ TYPOGRAPHY = {
 }
 
 # =============================================================================
-# Plot Styling
+# Plot Styling (Primary Definition)
 # =============================================================================
 PLOT_STYLES = {
     'colors': {
-        'deterministic': '#6C63FF',    # Main line in plots
-        'previous': '#00C896',         # Previous scenario line
-        'probabilistic': '#D3D3D3',    # Probabilistic scenarios
-        'saved_scenarios': '#FF6B6B',  # Saved scenarios
+        'deterministic': '#6C63FF',
+        'previous': '#00C896',
+        'probabilistic': '#D3D3D3',
+        'saved': '#FF6B6B',
         'grid': COLORS['grid']
     },
     'background': COLORS['background'],
     'grid': {
         'color': COLORS['grid'],
-        'alpha': 0.2,                  # Reduced from 0.5 to be less prominent
-        'linestyle': '-',              # Changed from '--' to solid line
-        'linewidth': 0.25              # Reduced from 0.5 for finer grid
+        'alpha': 0.2,
+        'linestyle': '-',
+        'linewidth': 0.25
     },
     'lines': {
         'deterministic': {
-            'linewidth': 3,            # Match original
+            'linewidth': 3,
             'alpha': 1.0
         },
         'previous': {
@@ -69,7 +63,7 @@ PLOT_STYLES = {
         },
         'probabilistic': {
             'linewidth': 1,
-            'alpha': 0.25              # Keep transparency for multiple lines
+            'alpha': 0.25
         },
         'saved': {
             'linewidth': 2,
@@ -79,36 +73,15 @@ PLOT_STYLES = {
 }
 
 # =============================================================================
-# Widget Styling
+# Widget Styling (Primary Definition)
 # =============================================================================
 WIDGET_STYLES = {
     'background': COLORS['background'],
-    'splitter': COLORS['background'],
-    'scrollarea': COLORS['background'],
-    'plot_face': COLORS['background'],
+    'plot_face': COLORS['background']
 }
 
 # =============================================================================
-# Button Styling
-# =============================================================================
-BUTTON_STYLE = """
-    QPushButton {
-        background-color: #7FA5C4;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-    }
-    QPushButton:hover {
-        background-color: #6E94B3;
-    }
-    QPushButton:pressed {
-        background-color: #5D83A2;
-    }
-"""
-
-# =============================================================================
-# Common Widget StyleSheets
+# Common StyleSheets (Primary Definition)
 # =============================================================================
 COMMON_STYLES = {
     'main_widget': f"""
@@ -168,20 +141,59 @@ COMMON_STYLES = {
     """
 }
 
-# Form Layout Constants
+# =============================================================================
+# Button Style
+# =============================================================================
+BUTTON_STYLE = """
+    QPushButton {
+        background-color: #7FA5C4;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+    }
+    QPushButton:hover {
+        background-color: #6E94B3;
+    }
+    QPushButton:pressed {
+        background-color: #5D83A2;
+    }
+"""
+
+# =============================================================================
+# Layout Constants
+# =============================================================================
 FORM_LAYOUT = {
     'spacing': {
-        'divider': 20,          # Spacing around dividers
-        'section': 10,          # Spacing between sections
-        'field': 5             # Spacing between fields
+        'divider': 20,
+        'section': 10,
+        'field': 5
     },
     'dimensions': {
-        'label_width': 150,    # Fixed width for labels
-        'tooltip_width': 20    # Width for tooltip buttons
+        'label_width': 150,
+        'tooltip_width': 20
     }
 }
 
-# Explanation Button Style
+# =============================================================================
+# Legacy/Compatibility Definitions (referencing primary definitions above)
+# =============================================================================
+
+# Legacy plot colors (referencing PLOT_STYLES)
+COLORS.update({
+    'plot_deterministic': PLOT_STYLES['colors']['deterministic'],
+    'plot_previous': PLOT_STYLES['colors']['previous'],
+    'plot_probabilistic': PLOT_STYLES['colors']['probabilistic'],
+    'plot_saved': PLOT_STYLES['colors']['saved']
+})
+
+# Legacy widget styles (referencing WIDGET_STYLES)
+WIDGET_STYLES.update({
+    'splitter': WIDGET_STYLES['background'],
+    'scrollarea': WIDGET_STYLES['background']
+})
+
+# Legacy tooltip and divider styles (using primary colors)
 TOOLTIP_STYLE = """
     QLabel {
         color: blue;
@@ -197,19 +209,17 @@ TOOLTIP_STYLE = """
     }
 """
 
-# Divider Style
 DIVIDER_STYLE = {
     'color': COLORS['border'],
     'height': 1,
     'margin': 20
 }
 
-# Client Details Label Style
-CLIENT_DETAILS_STYLE = """
-    QLabel {
-        font-size: 14pt;
+CLIENT_DETAILS_STYLE = f"""
+    QLabel {{
+        font-size: {TYPOGRAPHY['size']['title']};
         font-weight: bold;
         margin: 20px 0;
-        color: #333333;
-    }
+        color: {COLORS['text_primary']};
+    }}
 """

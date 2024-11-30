@@ -54,7 +54,7 @@ age_one_off_item_sold = 0  # Original value
 one_off_item_sale_price = one_off_item_purchase_price  # Original value
 providing_substantial_assistance_to_children_yes_or_no = "no"
 children_yes_or_no = "yes"
-number_of_children = 2
+number_of_children = 1
 child1_age = client1_age - 28
 child2_age = client1_age - 30
 child3_age = client1_age - 32
@@ -63,7 +63,7 @@ child5_age = client1_age - 36
 assisting_with_education_for_children_yes_or_no = (
     "yes"  # redundant, need to keep as "yes" until I update other modules
 )
-annual_amount_of_educational_assistance = 20000
+annual_amount_of_educational_assistance = 0
 age_of_providing_initial_educational_assistance = 19
 years_of_providing_educational_assistance = 5
 education_start_year_child1 = (
@@ -99,7 +99,7 @@ education_end_year_child5 = (
 providing_one_off_assistance_to_children_yes_or_no = (
     "yes"  # redundant, need to keep as "yes" until I update other modules
 )
-amount_of_one_off_assistance_to_children = 100000
+amount_of_one_off_assistance_to_children = 0
 age_of_one_off_assistance_to_children = 28
 allow_for_one_off_items_yes_or_no = "no"
 one_off_item1 = 0

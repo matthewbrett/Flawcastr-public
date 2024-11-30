@@ -21,6 +21,7 @@ from styles import (
     COLORS,
     FORM_LAYOUT
 )
+from PyQt5.QtCore import QTimer
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 default_csv_path = os.path.join(BASE_DIR, "default.csv")
@@ -332,6 +333,12 @@ if __name__ == "__main__":
     load_initial_configuration()
 
     dialog = ClientInfoDialog()
+    # Make the dialog appear briefly
+    dialog.show()
+    # Automatically trigger accept after a very short delay
+    QTimer.singleShot(300, dialog.accept)
+    
+    # The rest of the code remains the same
     if dialog.exec_():
         client_info = dialog.get_data()
 

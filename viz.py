@@ -27,66 +27,33 @@ import os
 import numpy as np
 import pandas as pd
 from viz_widgets import init_input_widget
-from styles import COLORS, PLOT_STYLES, COMMON_STYLES, BUTTON_STYLE
+from styles import (
+    COLORS, 
+    PLOT_STYLES, 
+    COMMON_STYLES, 
+    BUTTON_STYLE, 
+    TYPOGRAPHY, 
+    FORM_LAYOUT
+)
 from viz_charts import ChartManager
 
-# Remove duplicate color definitions and use imported styles
+# Use imported colors
 BACKGROUND_COLOR = COLORS['background']
 INPUT_FIELD_COLOR = COLORS['input_field']
-FONT_FAMILY = "Segoe UI"
+GRID_COLOR = COLORS['grid']
+FONT_FAMILY = "Segoe UI"          # Keep original font settings
 FONT_COLOR = COLORS['text_primary']
 TITLE_COLOR = COLORS['text_title']
 
-# Use plot colors from styles
+# Use imported plot colors
 plot_colors = PLOT_STYLES['colors']
 
-# Button colors
-button_style = """
-    QPushButton {
-        background-color: #7FA5C4;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-    }
-    QPushButton:hover {
-        background-color: #6E94B3;
-    }
-    QPushButton:pressed {
-        background-color: #5D83A2;
-    }
-"""
-
-# Color scheme variables - using darker blue background
-BACKGROUND_COLOR = "#E1ECF4"      # Darker blue background for entire app
-INPUT_FIELD_COLOR = "#EDF2F7"     # Slightly lighter blue for input fields
-ACCENT_COLOR = "#6C63FF"          # Vibrant purple for primary actions
-GRID_COLOR = "#E9ECEF"            # Lighter gray for grid lines
-
-# Add these font constants
-FONT_FAMILY = "Segoe UI"          # Modern, clean font that's available on most systems
-FONT_COLOR = "#333333"            # Dark gray for better readability
-TITLE_COLOR = "#1a1a1a"           # Slightly darker for the title
-
-# Ensure ALL background color variables are set to the same blue
+# Keep original background color assignments
 qwidget_background_colour = BACKGROUND_COLOR
 qsplitter_background_colour = BACKGROUND_COLOR
 qscrollarea_background_colour = BACKGROUND_COLOR
 init_plot_widget_facecolor = BACKGROUND_COLOR
 init_plot_widget_stylesheet_background_color = BACKGROUND_COLOR
-
-# Plot colors - more distinct and vibrant
-plot_colors = {
-    'deterministic': '#6C63FF',    # Vibrant purple for main line
-    'previous': '#00C896',         # Bright teal for previous line
-    'probabilistic': '#D3D3D3',    # Light gray for probabilistic
-    'saved_scenarios': '#FF6B6B',  # Coral red for saved scenarios
-    'grid': GRID_COLOR            # Consistent grid color
-}
-
-# Update these color constants at the top of viz.py
-SCROLLBAR_COLOR = "#A5C4E0"  # Light blue-gray color from your scrollbar
-BORDER_COLOR = "#A5C4E0"     # Matching color for borders
 
 def currency_formatter(x, pos):
     return "${:,.0f}".format(x)
@@ -171,7 +138,7 @@ class MyWindow(QMainWindow):
         scroll_container = QWidget()
         scroll_layout = QVBoxLayout(scroll_container)
         scroll_layout.setContentsMargins(20, 20, 40, 20)
-        scroll_layout.setSpacing(12)  # Increased spacing between items
+        scroll_layout.setSpacing(12)
         
         # Initialize input widget
         self.config_var_format = {}
@@ -179,53 +146,11 @@ class MyWindow(QMainWindow):
         
         # Create scroll area for input widget
         scroll = QScrollArea()
-        scroll.setStyleSheet(f"""
-            QScrollArea {{ 
-                border: none; 
-                background-color: {BACKGROUND_COLOR}; 
-                padding-right: 20px;
-            }}
-            QLineEdit, QComboBox {{
-                min-height: 30px;  /* Set minimum height for input fields */
-                padding: 5px;      /* Add internal padding */
-            }}
-            QLabel {{
-                min-height: 25px;  /* Set minimum height for labels */
-                padding: 5px 0;    /* Add vertical padding */
-            }}
-            QScrollBar:vertical {{
-                border: none;
-                background: transparent;
-                width: 6px;
-                margin: 0px;
-            }}
-            QScrollBar::handle:vertical {{
-                background: #A5C4E0;
-                min-height: 20px;
-                border-radius: 3px;
-                opacity: 0.7;
-            }}
-            QScrollBar::add-line:vertical,
-            QScrollBar::sub-line:vertical {{
-                height: 0px;
-            }}
-            QScrollBar::add-page:vertical,
-            QScrollBar::sub-page:vertical {{
-                background: none;
-            }}
-            QScrollBar:horizontal {{
-                height: 0px;
-            }}
-        """)
+        scroll.setStyleSheet(COMMON_STYLES['scroll_area'])
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.input_widget)
-        
-        # Ensure input widget uses proper spacing
-        self.input_widget.setLayout(QVBoxLayout())
-        self.input_widget.layout().setSpacing(12)  # Increased spacing between items
-        self.input_widget.layout().setContentsMargins(0, 0, 0, 0)
         
         # Add scroll area to scroll container
         scroll_layout.addWidget(scroll)
@@ -248,6 +173,11 @@ class MyWindow(QMainWindow):
         buttons_layout.addWidget(clear_button)
         buttons_layout.addWidget(feedback_button)
         
+        # Apply button styles
+        save_button.setStyleSheet(BUTTON_STYLE)
+        clear_button.setStyleSheet(BUTTON_STYLE)
+        feedback_button.setStyleSheet(BUTTON_STYLE)
+        
         # Add widgets to left layout
         left_layout.addWidget(scroll_container, 1)  # Add stretch factor
         left_layout.addWidget(buttons_container, 0)  # No stretch
@@ -256,76 +186,33 @@ class MyWindow(QMainWindow):
         main_layout.addWidget(left_container, 1)   # Now first
         main_layout.addWidget(right_container, 2)  # Now second
         
+        # Now apply all styles
+        self.setStyleSheet(COMMON_STYLES['main_widget'])
+        
+        # Apply plot styling
+        self.fig.patch.set_facecolor(PLOT_STYLES['background'])
+        self.ax.set_facecolor(PLOT_STYLES['background'])
+        
+        # Apply scroll area styling
+        scroll.setStyleSheet(COMMON_STYLES['scroll_area'])
+        
+        # Apply input styling
+        self.input_widget.setStyleSheet(COMMON_STYLES['input_fields'])
+        
+        # Apply button styles
+        save_button.setStyleSheet(BUTTON_STYLE)
+        clear_button.setStyleSheet(BUTTON_STYLE)
+        feedback_button.setStyleSheet(BUTTON_STYLE)
+
+        # Set button layout spacing
+        buttons_layout.setContentsMargins(10, 5, 10, 5)
+        buttons_layout.setSpacing(FORM_LAYOUT['spacing']['field'])
+        
         self.setCentralWidget(main_widget)
         
         # Connect plot update signal
         self.plot_needs_update.connect(self.update_plot)
         self.update_plot()
-
-        # Apply button styles
-        save_button.setStyleSheet(button_style)
-        clear_button.setStyleSheet(button_style)
-        feedback_button.setStyleSheet(button_style)
-        
-        # Force background color on all widgets and style input fields with larger font
-        self.setStyleSheet(f"""
-            QWidget {{
-                background-color: {BACKGROUND_COLOR};
-                font-family: {FONT_FAMILY};
-                font-size: 12pt;
-                color: {FONT_COLOR};
-            }}
-            QLabel {{
-                font-family: {FONT_FAMILY};
-                font-size: 12pt;
-                color: {FONT_COLOR};
-            }}
-            QScrollArea {{ 
-                background-color: {BACKGROUND_COLOR};
-            }}
-            QScrollArea > QWidget > QWidget {{
-                background-color: {BACKGROUND_COLOR};
-            }}
-            QLineEdit {{
-                background-color: {INPUT_FIELD_COLOR};
-                border: 1px solid #D1D5DB;
-                border-radius: 4px;
-                padding: 5px;
-                font-family: {FONT_FAMILY};
-                font-size: 12pt;
-                color: {FONT_COLOR};
-            }}
-            QComboBox {{
-                background-color: {INPUT_FIELD_COLOR};
-                border: 1px solid #D1D5DB;
-                border-radius: 4px;
-                padding: 5px;
-                font-family: {FONT_FAMILY};
-                font-size: 12pt;
-                color: {FONT_COLOR};
-            }}
-            QPushButton {{
-                font-family: {FONT_FAMILY};
-                font-size: 11pt;
-                {button_style}
-            }}
-        """)
-        
-        main_widget.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
-        self.input_widget.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
-        
-        # Update canvas background
-        self.canvas.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
-        self.fig.patch.set_facecolor(BACKGROUND_COLOR)
-        self.ax.set_facecolor(BACKGROUND_COLOR)
-
-        # Reduce spacing in button layout
-        buttons_layout.setContentsMargins(10, 5, 10, 5)  # Reduced vertical margins
-        buttons_layout.setSpacing(10)  # Reduced spacing between buttons
-
-        # Apply common styles to widgets
-        self.setStyleSheet(COMMON_STYLES['main_widget'])
-        self.input_widget.setStyleSheet(COMMON_STYLES['main_widget'] + COMMON_STYLES['input_fields'])  # Add input_fields style
 
     def init_plot_widget(self):
         self.update_plot()
