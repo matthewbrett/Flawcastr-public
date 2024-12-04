@@ -388,6 +388,7 @@ def toggle_all_sections(window, button):
 
 def init_input_widget(window):
     window.input_widget = QWidget()
+    window.input_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
     window.input_layout = QVBoxLayout()
     window.input_layout.setAlignment(Qt.AlignTop)
     window.config_fields = {}
