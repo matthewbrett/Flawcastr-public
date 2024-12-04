@@ -137,7 +137,7 @@ class MyWindow(QMainWindow):
         # Create scroll area container for input widgets
         scroll_container = QWidget()
         scroll_layout = QVBoxLayout(scroll_container)
-        scroll_layout.setContentsMargins(20, 20, 40, 20)
+        scroll_layout.setContentsMargins(20, 20, 0, 20)
         scroll_layout.setSpacing(12)
         
         # Initialize input widget
@@ -147,7 +147,7 @@ class MyWindow(QMainWindow):
         # Create scroll area for input widget
         scroll = QScrollArea()
         scroll.setStyleSheet(COMMON_STYLES['scroll_area'])
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.input_widget)
@@ -166,17 +166,17 @@ class MyWindow(QMainWindow):
         save_button.clicked.connect(self.on_save_scenario_clicked)
         clear_button = QPushButton("Clear saved scenarios")
         clear_button.clicked.connect(self.on_clear_scenarios_clicked)
-        feedback_button = QPushButton("Leave feedback")
-        feedback_button.clicked.connect(self.open_email_client)
+        # feedback_button = QPushButton("Leave feedback")
+        # feedback_button.clicked.connect(self.open_email_client)
         
         buttons_layout.addWidget(save_button)
         buttons_layout.addWidget(clear_button)
-        buttons_layout.addWidget(feedback_button)
+        # buttons_layout.addWidget(feedback_button)
         
         # Apply button styles
         save_button.setStyleSheet(BUTTON_STYLE)
         clear_button.setStyleSheet(BUTTON_STYLE)
-        feedback_button.setStyleSheet(BUTTON_STYLE)
+        # feedback_button.setStyleSheet(BUTTON_STYLE)
         
         # Add widgets to left layout
         left_layout.addWidget(scroll_container, 1)  # Add stretch factor
@@ -202,7 +202,7 @@ class MyWindow(QMainWindow):
         # Apply button styles
         save_button.setStyleSheet(BUTTON_STYLE)
         clear_button.setStyleSheet(BUTTON_STYLE)
-        feedback_button.setStyleSheet(BUTTON_STYLE)
+        # feedback_button.setStyleSheet(BUTTON_STYLE)
 
         # Set button layout spacing
         buttons_layout.setContentsMargins(10, 5, 10, 5)
@@ -217,14 +217,14 @@ class MyWindow(QMainWindow):
     def init_plot_widget(self):
         self.update_plot()
 
-    def open_email_client(self):
-        email = "sonnie.bailey@outlook.com"
-        subject = "Flawcastr feedback"
-        body = ""
+    # def open_email_client(self):
+    #     email = "sonnie.bailey@outlook.com"
+    #     subject = "Flawcastr feedback"
+    #     body = ""
 
-        QDesktopServices.openUrl(
-            QUrl(f"mailto:{email}?subject={subject}&body={body}", QUrl.TolerantMode)
-        )
+    #     QDesktopServices.openUrl(
+    #         QUrl(f"mailto:{email}?subject={subject}&body={body}", QUrl.TolerantMode)
+    #    )
 
     def on_save_scenario_clicked(self):
         # Open a dialog box for the user to input the scenario name

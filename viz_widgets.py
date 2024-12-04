@@ -83,6 +83,7 @@ class CollapsibleSection(QWidget):
         
         # Content widget
         self.content = QWidget()
+        self.content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.content.setStyleSheet(CONTENT_WIDGET_STYLE)
         self.content_layout = QVBoxLayout(self.content)
         self.content_layout.setContentsMargins(*CONTENT_LAYOUT_MARGINS)
