@@ -42,7 +42,7 @@ PLOT_STYLES = {
         'deterministic': '#6C63FF',
         'previous': '#00C896',
         'probabilistic': '#D3D3D3',
-        'saved': '#FF6B6B',
+        'saved_scenarios': '#FF6B6B',
         'grid': COLORS['grid']
     },
     'background': COLORS['background'],
@@ -65,7 +65,7 @@ PLOT_STYLES = {
             'linewidth': 1,
             'alpha': 0.25
         },
-        'saved': {
+        'saved_scenarios': {
             'linewidth': 2,
             'alpha': 0.7
         }
@@ -184,7 +184,7 @@ COLORS.update({
     'plot_deterministic': PLOT_STYLES['colors']['deterministic'],
     'plot_previous': PLOT_STYLES['colors']['previous'],
     'plot_probabilistic': PLOT_STYLES['colors']['probabilistic'],
-    'plot_saved': PLOT_STYLES['colors']['saved']
+    'plot_saved': PLOT_STYLES['colors']['saved_scenarios']
 })
 
 # Legacy widget styles (referencing WIDGET_STYLES)
